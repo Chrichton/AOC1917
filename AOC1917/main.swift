@@ -245,6 +245,8 @@ print(result)
 
 // ---------------------------------------------------------
 
-//program = Program(memory: memoryString, input: 2)
-//
-//program.run()
+program = Program(memory: "2" + memoryString.dropFirst(), input: 1)
+
+let input2 = program.run()
+
+print(input2)
