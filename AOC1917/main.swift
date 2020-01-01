@@ -209,9 +209,47 @@ var program = Program(memory: memoryString, input: 1)
 let input = program.run()
 print(input)
 
+enum Direction: Int, CaseIterable {
+    case north = 0
+    case east = 1
+    case south = 2
+    case west = 3
+    
+    func opposite() -> Direction {
+        switch self {
+            case .north: return .south
+            case .east: return .west
+            case .south: return .north
+            case .west: return .east
+        }
+    }
+}
+
 struct Point: Hashable {
     let x: Int
     let y: Int
+    
+    init(x: Int, y: Int) {
+           self.x = x
+           self.y = y
+       }
+    
+    init(point: Point, direction: Direction) {
+        switch direction {
+            case .north:
+                x = point.x
+                y = point.y - 1
+            case .east:
+                x = point.x + 1
+                y = point.y
+            case .south:
+                x = point.x
+                y = point.y + 1
+            case .west:
+                x = point.x - 1
+                y = point.y
+        }
+    }
 }
 
 extension Point {
@@ -245,8 +283,230 @@ print(result)
 
 // ---------------------------------------------------------
 
+class Node<T> {
+    var value: T? = nil
+    var next: Node<T>? = nil
+    var prev: Node<T>? = nil
+
+    init() {
+    }
+
+    init(value: T) {
+        self.value = value
+    }
+}
+
+class Queue<T> {
+
+var count: Int = 0
+
+var head: Node<T> = Node<T>()
+
+var tail: Node<T> = Node<T>()
+
+var currentNode : Node<T> = Node<T>()
+
+    init() {
+    }
+
+    func isEmpty() -> Bool {
+        return self.count == 0
+    }
+
+    func next(index:Int) -> T? {
+
+        if isEmpty() {
+            return nil
+        } else if self.count == 1 {
+            let temp: Node<T> = currentNode
+            return temp.value
+        } else if index == self.count{
+            return currentNode.value
+
+        }else {
+            let temp: Node<T> = currentNode
+            currentNode = currentNode.next!
+            return temp.value
+        }
+
+    }
+
+    func setCurrentNode(){
+        currentNode = head
+    }
+
+    func enQueue(key: T) {
+        let node = Node<T>(value: key)
+        if self.isEmpty() {
+            self.head = node
+            self.tail = node
+        } else {
+            node.next = self.head
+            self.head.prev = node
+            self.head = node
+        }
+
+        self.count += 1
+    }
+
+    func deQueue() -> T? {
+        if self.isEmpty() {
+            return nil
+        } else if self.count == 1 {
+            let temp: Node<T> = self.tail
+            self.count -= 1
+            return temp.value
+        } else {
+            let temp: Node<T> = self.tail
+            self.tail = self.tail.prev!
+            self.count -= 1
+            return temp.value
+        }
+    }
+
+
+
+    //retrieve the top most item
+    func peek() -> T? {
+        if isEmpty() {
+            return nil
+        }
+
+        return head.value!
+    }
+
+    func poll() -> T? {
+        if isEmpty() {
+            return nil
+        } else{
+            let temp:T = head.value!
+            let _ = deQueue()
+            return temp
+        }
+    }
+
+    func offer( key:T)->Bool{
+        var status:Bool = false;
+
+        self.enQueue(key: key)
+        status = true
+
+        return status
+    }
+}
+
 program = Program(memory: "2" + memoryString.dropFirst(), input: 1)
 
 let input2 = program.run()
 
 print(input2)
+
+enum Command {
+    case forward
+    case left
+    case right
+}
+
+struct Visit: Hashable {
+    let point: Point
+    let fromDirection: Direction
+}
+
+struct Path {
+    let point: Point
+    let commands: [Command]
+}
+
+func toCommand(fromDirection: Direction, toDirection: Direction) -> [Command] {
+    if fromDirection == toDirection {
+        return [.forward]
+    }
+    
+    if fromDirection.opposite() == toDirection {
+        return [.left, .left, .forward]
+    }
+    
+    if fromDirection == .west && toDirection == .north {
+        return [.right, .forward]
+    }
+ 
+    if fromDirection == .north && toDirection == .west {
+         return [.left, .forward]
+     }
+    
+    if fromDirection.rawValue < toDirection.rawValue {
+        return [.right, .forward]
+    }
+    
+    return [.left, .forward]
+}
+
+struct RobotState {
+    let direction: Direction
+    let point: Point
+    let paths: [Path]
+    let visited: Set<Visit>
+    
+    func getNextPoints() -> [(point: Point, direction: Direction)] {
+        return Direction
+            .allCases
+            .filter{ $0 != direction.opposite() }
+            .map{ (point: Point(point: point, direction: $0), direction: $0) }
+            .filter{ scaffoldPoints.contains($0.point) && !visited.contains(Visit(point: $0.point, fromDirection: $0.direction))}
+    }
+    
+    func getNextStates() -> [RobotState] {
+        getNextPoints()
+            .map {
+                let (toPoint, toDirection) = $0
+                let commands = toCommand(fromDirection: direction, toDirection: toDirection)
+                let path = Path(point: toPoint, commands: commands)
+                let newVisit = Visit(point: point, fromDirection: toDirection)
+                return RobotState(
+                    direction: toDirection,
+                    point: toPoint,
+                    paths: paths + [path],
+                    visited: visited.union([newVisit]))
+            }
+    }
+}
+
+let startPoint: Point? = zip(maze, 0..<maze.count)
+    .reduce(nil) { accu, current in
+        if accu != nil {
+            return accu
+        }
+        
+        let charaterPairs = zip(current.0, 0..<current.0.count)
+        let startPointPair = charaterPairs.filter{ $0.0 == "^" }.first
+        
+        return startPointPair == nil
+            ? nil
+            : Point(x: startPointPair!.1, y: current.1)
+    }
+
+var queue = Queue<RobotState>()
+var successPaths = [[Path]]()
+
+queue.enQueue(key: RobotState(direction: .north, point: startPoint!, paths: [], visited: []))
+
+repeat {
+    let robotState = queue.deQueue()!
+   
+//    print(queue.count)
+   // print(robotState)
+    
+    for robotState in robotState.getNextStates() {
+        let points = Set(robotState.visited.map{ $0.point })
+        if points.count == scaffoldPoints.count {
+            successPaths.append(robotState.paths)
+        } else
+        {
+            queue.enQueue(key: robotState)
+        }
+    }
+} while !queue.isEmpty()
+
+
+
+
