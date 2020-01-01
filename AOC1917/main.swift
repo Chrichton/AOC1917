@@ -461,7 +461,7 @@ struct RobotState {
                 let (toPoint, toDirection) = $0
                 let commands = toCommand(fromDirection: direction, toDirection: toDirection)
                 let path = Path(point: toPoint, commands: commands)
-                let newVisit = Visit(point: point, fromDirection: toDirection)
+                let newVisit = Visit(point: toPoint, fromDirection: toDirection)
                 return RobotState(
                     direction: toDirection,
                     point: toPoint,
@@ -491,9 +491,10 @@ var successPaths = [[Path]]()
 queue.enQueue(key: RobotState(direction: .north, point: startPoint!, paths: [], visited: []))
 
 repeat {
+    print(queue.count)
+
     let robotState = queue.deQueue()!
    
-//    print(queue.count)
    // print(robotState)
     
     for robotState in robotState.getNextStates() {
