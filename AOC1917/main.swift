@@ -508,6 +508,6 @@ repeat {
     }
 } while !queue.isEmpty()
 
-
+print(successPaths)
 
 
