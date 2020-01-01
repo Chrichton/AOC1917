@@ -206,7 +206,25 @@ var program = Program(memory: memoryString, input: 1)
 //..#####...^..
 //"""
 
-let input = program.run()
+let input = """
+#######...#####
+#.....#...#...#
+#.....#...#...#
+......#...#...#
+......#...###.#
+......#.....#.#
+^########...#.#
+......#.#...#.#
+......#########
+........#...#..
+....#########..
+....#...#......
+....#...#......
+....#...#......
+....#####......
+"""
+
+//let input = program.run()
 print(input)
 
 enum Direction: Int, CaseIterable {
@@ -461,12 +479,14 @@ struct RobotState {
                 let (toPoint, toDirection) = $0
                 let commands = toCommand(fromDirection: direction, toDirection: toDirection)
                 let path = Path(point: toPoint, commands: commands)
-                let newVisit = Visit(point: toPoint, fromDirection: toDirection)
+                let newVisits = [
+                    Visit(point: toPoint, fromDirection: toDirection),
+                    Visit(point: toPoint, fromDirection: toDirection.opposite())]
                 return RobotState(
                     direction: toDirection,
                     point: toPoint,
                     paths: paths + [path],
-                    visited: visited.union([newVisit]))
+                    visited: visited.union(newVisits))
             }
     }
 }
@@ -487,10 +507,12 @@ let startPoint: Point? = zip(maze, 0..<maze.count)
 
 var queue = Queue<RobotState>()
 var successPaths = [[Path]]()
+var steps = 0
 
 queue.enQueue(key: RobotState(direction: .north, point: startPoint!, paths: [], visited: []))
 
 repeat {
+    steps += 1
     print(queue.count)
 
     let robotState = queue.deQueue()!
@@ -508,6 +530,7 @@ repeat {
     }
 } while !queue.isEmpty()
 
+print(steps)
 print(successPaths)
 
 
