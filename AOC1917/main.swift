@@ -206,25 +206,25 @@ var program = Program(memory: memoryString, input: 1)
 //..#####...^..
 //"""
 
-let input = """
-#######...#####
-#.....#...#...#
-#.....#...#...#
-......#...#...#
-......#...###.#
-......#.....#.#
-^########...#.#
-......#.#...#.#
-......#########
-........#...#..
-....#########..
-....#...#......
-....#...#......
-....#...#......
-....#####......
-"""
+//let input = """
+//#######...#####
+//#.....#...#...#
+//#.....#...#...#
+//......#...#...#
+//......#...###.#
+//......#.....#.#
+//^########...#.#
+//......#.#...#.#
+//......#########
+//........#...#..
+//....#########..
+//....#...#......
+//....#...#......
+//....#...#......
+//....#####......
+//"""
 
-//let input = program.run()
+let input = program.run()
 print(input)
 
 enum Direction: Int, CaseIterable {
@@ -480,8 +480,7 @@ struct RobotState {
                 let commands = toCommand(fromDirection: direction, toDirection: toDirection)
                 let path = Path(point: toPoint, commands: commands)
                 let newVisits = [
-                    Visit(point: toPoint, fromDirection: toDirection),
-                    Visit(point: toPoint, fromDirection: toDirection.opposite())]
+                    Visit(point: toPoint, fromDirection: toDirection)]
                 return RobotState(
                     direction: toDirection,
                     point: toPoint,
@@ -505,32 +504,89 @@ let startPoint: Point? = zip(maze, 0..<maze.count)
             : Point(x: startPointPair!.1, y: current.1)
     }
 
-var queue = Queue<RobotState>()
-var successPaths = [[Path]]()
-var steps = 0
-
-queue.enQueue(key: RobotState(direction: .north, point: startPoint!, paths: [], visited: []))
-
-repeat {
-    steps += 1
-    print(queue.count)
-
-    let robotState = queue.deQueue()!
-   
-   // print(robotState)
+func compressPaths(_ paths: [Path]) -> String {
+    let commands: [Command] = paths
+        .map{ $0.commands }
+        .flatMap{ $0 }
     
-    for robotState in robotState.getNextStates() {
-        let points = Set(robotState.visited.map{ $0.point })
-        if points.count == scaffoldPoints.count {
-            successPaths.append(robotState.paths)
-        } else
-        {
-            queue.enQueue(key: robotState)
+    return commands.reduce((string: "", forwardCount: 0)){ accu, current in
+        switch current {
+            case .left: return accu.forwardCount == 0
+                            ? (accu.string + "L", 0)
+                            : (accu.string + String(accu.forwardCount) + " L", 0)
+            case .right: return accu.forwardCount == 0
+                            ? (accu.string + "R", 0)
+                            : (accu.string + String(accu.forwardCount) + " R", 0)
+            case .forward:
+                return (accu.string, accu.forwardCount + 1)
         }
-    }
-} while !queue.isEmpty()
+    }.string
+}
 
-print(steps)
-print(successPaths)
+func getDocumentsDirectory() -> URL {
+    let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+    return paths[0]
+}
+
+func visitNextStates(_ state: RobotState, commandString: inout String?) {
+    let points = Set(state.visited.map{ $0.point })
+    if points.count == scaffoldPoints.count {
+    let result = compressPaths(state.paths)
+       
+    if commandString != nil {
+        let c = Set(commandString!.split(separator: " ").map{String($0)})
+        let r = Set(result.split(separator: " ").map{String($0)})
+        if  r.count < c.count {
+            commandString = result
+        }
+    } else {
+        commandString = result
+    }
+        
+//        let filename = getDocumentsDirectory().appendingPathComponent("day17_" + UUID().uuidString + ".txt")
+//        do {
+//            try result.write(to: filename, atomically: true, encoding: String.Encoding.utf8)
+//        } catch {
+//            // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
+//        }
+
+    }
+    
+    for nextState in state.getNextStates() {
+        visitNextStates(nextState, commandString: &commandString)
+    }
+}
+
+var commandString: String?
+let state = RobotState(direction: .north, point: startPoint!, paths: [], visited: [])
+visitNextStates(state, commandString: &commandString)
+
+//var queue = Queue<RobotState>()
+//var successPaths = [[Path]]()
+//var steps = 0
+//
+//queue.enQueue(key: RobotState(direction: .north, point: startPoint!, paths: [], visited: []))
+//
+//repeat {
+//    steps += 1
+//    print(queue.count)
+//
+//    let robotState = queue.deQueue()!
+//
+//   // print(robotState)
+//
+//    for robotState in robotState.getNextStates() {
+//        let points = Set(robotState.visited.map{ $0.point })
+//        if points.count == scaffoldPoints.count {
+//            successPaths.append(robotState.paths)
+//        } else
+//        {
+//            queue.enQueue(key: robotState)
+//        }
+//    }
+//} while !queue.isEmpty()
+//
+//print(steps)
+//print(successPaths)
 
 
