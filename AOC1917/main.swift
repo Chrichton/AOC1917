@@ -469,6 +469,7 @@ struct RobotState {
         return Direction
             .allCases
             .filter{ $0 != direction.opposite() }
+            .sorted(by: { d1, _ in d1 == direction })
             .map{ (point: Point(point: point, direction: $0), direction: $0) }
             .filter{ scaffoldPoints.contains($0.point) && !visited.contains(Visit(point: $0.point, fromDirection: $0.direction))}
     }
@@ -523,44 +524,33 @@ func compressPaths(_ paths: [Path]) -> String {
     }.string
 }
 
-func getDocumentsDirectory() -> URL {
-    let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-    return paths[0]
-}
-
-func visitNextStates(_ state: RobotState, commandString: inout String?) {
-    let points = Set(state.visited.map{ $0.point })
-    if points.count == scaffoldPoints.count {
-    let result = compressPaths(state.paths)
-       
-    if commandString != nil {
-        let c = Set(commandString!.split(separator: " ").map{String($0)})
-        let r = Set(result.split(separator: " ").map{String($0)})
-        if  r.count < c.count {
-            commandString = result
-        }
-    } else {
-        commandString = result
-    }
-        
-//        let filename = getDocumentsDirectory().appendingPathComponent("day17_" + UUID().uuidString + ".txt")
-//        do {
-//            try result.write(to: filename, atomically: true, encoding: String.Encoding.utf8)
-//        } catch {
-//            // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
+// Depth-First
+//func visitNextStates(_ state: RobotState, commandString: inout String?) {
+//    let points = Set(state.visited.map{ $0.point })
+//    if points.count == scaffoldPoints.count {
+//        let result = compressPaths(state.paths)
+//
+//        if commandString != nil {
+//            let c = Set(commandString!.split(separator: " ").map{String($0)})
+//            let r = Set(result.split(separator: " ").map{String($0)})
+//            if  r.count < c.count {
+//                commandString = result
+//            }
+//        } else {
+//            commandString = result
 //        }
+//    }
+//
+//    for nextState in state.getNextStates() {
+//        visitNextStates(nextState, commandString: &commandString)
+//    }
+//}
+//
+//var commandString: String?
+//let state = RobotState(direction: .north, point: startPoint!, paths: [], visited: [])
+//visitNextStates(state, commandString: &commandString)
 
-    }
-    
-    for nextState in state.getNextStates() {
-        visitNextStates(nextState, commandString: &commandString)
-    }
-}
-
-var commandString: String?
-let state = RobotState(direction: .north, point: startPoint!, paths: [], visited: [])
-visitNextStates(state, commandString: &commandString)
-
+// Breadth first
 //var queue = Queue<RobotState>()
 //var successPaths = [[Path]]()
 //var steps = 0
@@ -588,5 +578,37 @@ visitNextStates(state, commandString: &commandString)
 //
 //print(steps)
 //print(successPaths)
+
+
+// --------------------------------
+// Lösung:
+// L10 L10 R6 L10 L10 R6 R12 L12 L12 R12 L12 L12 L6 L10 R12 R12 R12 L12 L12 L6 L10 R12 R12 R12 L12 L12 L6 L10 R12 R12 L10 L10
+
+//L10 L10 R6
+//L10 L10 R6
+//R12 L12 L12
+//R12 L12 L12 L6 L10 R12 R12
+//R12 L12 L12 L6 L10 R12 R12
+//R12 L12 L12 L6 L10 R12 R12
+//L10 L10 (R6)
+
+//A: L10 L10 R6
+//B: R12 L12 L12
+//C: R12 L12 L12 L6 L10 R12 R12
+//
+//Main Routine: A ,  A  ,  B  ,  B  ,  C. ,  C.  , C
+//ASCII Input: 65,44,65,44,66,44,66,44,67,44,67,44,67,10)
+
+func toAscii(_ str: String) -> [Int] {
+    return (str + "\n")
+        .map{ Int($0.asciiValue!) }
+}
+
+let mainRoutine = toAscii("A,A,B,B,C,C,C")
+let functionA = toAscii("L,1,0,L,1,0,R,6")
+let functionB = toAscii("R,1,2,L,1,2,L,12")
+let functionC = toAscii("R,1,2,L,1,2,L,1,2,L,6,L,1,0,R,1,2,R,1,2")
+
+print()
 
 
