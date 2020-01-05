@@ -14,8 +14,8 @@
             filePath = "AOC1917/main.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "534"
-            endingLineNumber = "534"
+            startingLineNumber = "531"
+            endingLineNumber = "531"
             landmarkName = "unknown"
             landmarkType = "0">
             <Actions>
@@ -27,6 +27,86 @@
                   </ActionContent>
                </BreakpointActionProxy>
             </Actions>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "69C49586-BE18-463B-881D-CDB1FD710E28"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "AOC1917/main.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "619"
+            endingLineNumber = "619"
+            landmarkName = "unknown"
+            landmarkType = "0">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "5100156D-2F5D-4B3C-A73F-967ED08A8F0E"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "AOC1917/main.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "134"
+            endingLineNumber = "134"
+            landmarkName = "run(input:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "718A486D-B034-4E03-8525-ABEB5C494682"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "AOC1917/main.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "95"
+            endingLineNumber = "95"
+            landmarkName = "run(input:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "718A486D-B034-4E03-8525-ABEB5C494682 - 8040a0e3a697ab35"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "AOC1917.Program.run(input: Swift.Array&lt;Swift.Int&gt;) -&gt; Swift.String"
+                  moduleName = "AOC1917"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/heikogoes/Downloads/AOC1917/AOC1917/main.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "95"
+                  endingLineNumber = "95"
+                  offsetFromSymbolStart = "1859">
+               </Location>
+               <Location
+                  uuid = "718A486D-B034-4E03-8525-ABEB5C494682 - 8040a0e3a697ab35"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "AOC1917.Program.run(input: Swift.Array&lt;Swift.Int&gt;) -&gt; Swift.String"
+                  moduleName = "AOC1917"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/heikogoes/Downloads/AOC1917/AOC1917/main.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "95"
+                  endingLineNumber = "95"
+                  offsetFromSymbolStart = "1900">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
