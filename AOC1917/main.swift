@@ -612,7 +612,6 @@ let functionA = toAscii("L,10,L,10,R,6")
 let functionB = toAscii("R,12,L,12,L,12")
 let functionC = toAscii("L,6,L,10,R,12,R,12")
 let noVideoFeed = toAscii("n")
-
 let all = mainRoutine + functionA + functionB + functionC + noVideoFeed
 
 program = Program(memory: "2" + memoryString.dropFirst())
