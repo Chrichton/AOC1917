@@ -61,7 +61,6 @@ enum ParameterMode: Int {
 struct Program {
     private(set) var memory: [Int]
     private var instructionPointer = 0
-    private let input: Int
     private var relativeBase = 0
     
     public mutating func getNextParameter(parameterMode: ParameterMode) -> Int {
@@ -79,8 +78,10 @@ struct Program {
         return parameter
     }
     
-    public mutating func run() -> String {
+    public mutating func run(input: [Int]) -> String {
+        var inputIterator = input.makeIterator()
         var result = ""
+        
         repeat {
             var startString = String(memory[instructionPointer])
             if startString.count == 1 {
@@ -124,9 +125,9 @@ struct Program {
                     let parameter = getNextParameter(parameterMode: .Immediate)
                     let parameterMode = parameterModes.getNext()
                     if parameterMode == .Relative {
-                        memory[parameter + relativeBase] = input
+                        memory[parameter + relativeBase] = inputIterator.next()!
                     } else {
-                        memory[parameter] = input
+                        memory[parameter] = inputIterator.next()!
                     }
                 case .Output:
                     let parameter1 = getNextParameter(parameterMode: parameterModes.getNext())
@@ -178,11 +179,10 @@ struct Program {
         } while true
     }
     
-    init(memory: String, input: Int) {
+    init(memory: String) {
         self.memory = memory
             .split(separator: ",")
             .map{ Int($0)! }
-        self.input = input
     }
 }
 
@@ -194,7 +194,7 @@ let memoryString = """
 """
     + String(repeating: ",0", count: 10000)
 
-var program = Program(memory: memoryString, input: 1)
+var program = Program(memory: memoryString)
 
 //let input = """
 //..#..........
@@ -224,7 +224,7 @@ var program = Program(memory: memoryString, input: 1)
 //....#####......
 //"""
 
-let input = program.run()
+let input = program.run(input: [])
 print(input)
 
 enum Direction: Int, CaseIterable {
@@ -413,12 +413,6 @@ var currentNode : Node<T> = Node<T>()
     }
 }
 
-program = Program(memory: "2" + memoryString.dropFirst(), input: 1)
-
-let input2 = program.run()
-
-print(input2)
-
 enum Command {
     case forward
     case left
@@ -584,31 +578,46 @@ func compressPaths(_ paths: [Path]) -> String {
 // Lösung:
 // L10 L10 R6 L10 L10 R6 R12 L12 L12 R12 L12 L12 L6 L10 R12 R12 R12 L12 L12 L6 L10 R12 R12 R12 L12 L12 L6 L10 R12 R12 L10 L10
 
-//L10 L10 R6
-//L10 L10 R6
-//R12 L12 L12
-//R12 L12 L12 L6 L10 R12 R12
-//R12 L12 L12 L6 L10 R12 R12
-//R12 L12 L12 L6 L10 R12 R12
-//L10 L10 (R6)
-
+//L10 L10 R6         A
+//L10 L10 R6         A
+//
+//R12 L12 L12        B
+//R12 L12 L12        B
+//
+//L6 L10 R12 R12     C
+//
+//R12 L12 L12        B
+//
+//L6 L10 R12 R12     C
+//
+//R12 L12 L12        B
+//
+//L6 L10 R12 R12     C
+//
+//L10 L10 R6         A
+//
 //A: L10 L10 R6
 //B: R12 L12 L12
-//C: R12 L12 L12 L6 L10 R12 R12
+//C: L6 L10 R12 R12
 //
-//Main Routine: A ,  A  ,  B  ,  B  ,  C. ,  C.  , C
-//ASCII Input: 65,44,65,44,66,44,66,44,67,44,67,44,67,10)
+//Main: A,A,B,B,C,B,C,B.C,A
 
 func toAscii(_ str: String) -> [Int] {
     return (str + "\n")
         .map{ Int($0.asciiValue!) }
 }
 
-let mainRoutine = toAscii("A,A,B,B,C,C,C")
-let functionA = toAscii("L,1,0,L,1,0,R,6")
-let functionB = toAscii("R,1,2,L,1,2,L,12")
-let functionC = toAscii("R,1,2,L,1,2,L,1,2,L,6,L,1,0,R,1,2,R,1,2")
+let mainRoutine = toAscii("A,A,B,B,C,B,C,B,C,A")
+let functionA = toAscii("L,10,L,10,R,6")
+let functionB = toAscii("R,12,L,12,L,12")
+let functionC = toAscii("L,6,L,10,R,12,R,12")
+let noVideoFeed = toAscii("n")
 
-print()
+let all = mainRoutine + functionA + functionB + functionC + noVideoFeed
+
+program = Program(memory: "2" + memoryString.dropFirst())
+
+let m = program.run(input: all)
+print(m)
 
 
