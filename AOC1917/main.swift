@@ -78,9 +78,9 @@ struct Program {
         return parameter
     }
     
-    public mutating func run(input: [Int]) -> String {
+    public mutating func run(input: [Int]) -> [Int] {
         var inputIterator = input.makeIterator()
-        var result = ""
+        var result = [Int]()
         
         repeat {
             var startString = String(memory[instructionPointer])
@@ -131,7 +131,7 @@ struct Program {
                     }
                 case .Output:
                     let parameter1 = getNextParameter(parameterMode: parameterModes.getNext())
-                    result = result + String(Character(UnicodeScalar(parameter1)!))
+                    result.append(parameter1)
                 case .JumpIfTrue:
                     let parameter1 = getNextParameter(parameterMode: parameterModes.getNext())
                     if parameter1 != 0 {
@@ -224,7 +224,11 @@ var program = Program(memory: memoryString)
 //....#####......
 //"""
 
-let input = program.run(input: [])
+func toString(_ array: [Int]) -> String {
+    String(array.map{ Character(UnicodeScalar($0)!) })
+}
+
+let input = toString(program.run(input: []))
 print(input)
 
 enum Direction: Int, CaseIterable {
@@ -341,7 +345,7 @@ var currentNode : Node<T> = Node<T>()
         } else if index == self.count{
             return currentNode.value
 
-        }else {
+        } else {
             let temp: Node<T> = currentNode
             currentNode = currentNode.next!
             return temp.value
@@ -381,8 +385,6 @@ var currentNode : Node<T> = Node<T>()
             return temp.value
         }
     }
-
-
 
     //retrieve the top most item
     func peek() -> T? {
@@ -504,7 +506,7 @@ func compressPaths(_ paths: [Path]) -> String {
         .map{ $0.commands }
         .flatMap{ $0 }
     
-    return commands.reduce((string: "", forwardCount: 0)){ accu, current in
+    let result = commands.reduce((string: "", forwardCount: 0)){ accu, current in
         switch current {
             case .left: return accu.forwardCount == 0
                             ? (accu.string + "L", 0)
@@ -515,7 +517,11 @@ func compressPaths(_ paths: [Path]) -> String {
             case .forward:
                 return (accu.string, accu.forwardCount + 1)
         }
-    }.string
+    }
+    
+    return result.forwardCount == 0 ?
+        result.string
+        : result.string + String(result.forwardCount)
 }
 
 // Depth-First
@@ -616,7 +622,12 @@ let all = mainRoutine + functionA + functionB + functionC + noVideoFeed
 
 program = Program(memory: "2" + memoryString.dropFirst())
 
-let m = program.run(input: all)
-print(m)
+let result2 = program.run(input: all)
+
+print()
+print(toString(result2.dropLast()))
+
+print()
+print("Lösung: ", result2.last!)
 
 
